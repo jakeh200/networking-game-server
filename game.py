@@ -206,9 +206,9 @@ while True:
             sys.exit()
 
     # change the ball's direction if it hit a wall
-    if (ball.rect.x < ball_side):
+    if (ball.rect.x < 5):
         ball_dir = 'r'
-    if (ball.rect.y < ball_side):
+    if (ball.rect.y < 5):
         ball_dir = 'd'
     if (ball.rect.x > screen_width - ball_side):
         ball_dir = 'l'
@@ -297,11 +297,11 @@ while True:
         new_x_l = ball.rect.x - ball_vel
         if (ball_dir == 'd' and new_y_d < screen_height - ball_side):
             ball.rect.y = new_y_d
-        elif (ball_dir == 'u' and new_y_u > ball_side):
+        elif (ball_dir == 'u' and new_y_u > 0):
             ball.rect.y = new_y_u
         elif (ball_dir == 'r' and new_x_r < screen_width - ball_side):
             ball.rect.x = new_x_r
-        elif (ball_dir == 'l' and new_x_l > ball_side):
+        elif (ball_dir == 'l' and new_x_l > 0):
             ball.rect.x = new_x_l
         if (ball_vel > 0):
             ball_vel -= 1
