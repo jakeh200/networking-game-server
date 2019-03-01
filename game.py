@@ -15,9 +15,9 @@ pygame.init()
 #####################################################################
 ## --- NEXT 4 LINES MUST BE MODIFIED TO MATCH ACTUAL SITUATION --- ##
 MY_SERVER_HOST = '192.168.0.14'
-MY_SERVER_PORT = 8999
+MY_SERVER_PORT = 9999
 OTHER_HOST = '192.168.0.19'
-OTHER_PORT = 8992
+OTHER_PORT = 9992
 #####################################################################
 
 RED = (255, 0, 0)
@@ -38,8 +38,6 @@ redx = 100
 redy = screen_height//2
 bluex = screen_width - 100
 bluey = screen_height//2
-
-screen = pygame.display.set_mode((screen_width, screen_height))
 
 WHITE = (255, 255, 255)
 RED = (255, 0, 0)
@@ -165,6 +163,9 @@ def define_players_and_goals():
 ####                           GAME SETUP                          ####
 #######################################################################
 
+# Create the play window
+screen = pygame.display.set_mode((screen_width, screen_height))
+
 # Define the players, goals, and ball
 me, enemy, me_goal, enemy_goal = define_players_and_goals()
 ball = Ball()
@@ -180,7 +181,6 @@ server = connection.Server(MY_SERVER_HOST, MY_SERVER_PORT)
 
 # Set the field background
 BackGround = Background('field.jpg', [0,0])
-win = pygame.display.set_mode((852, 480))
 pygame.display.set_caption("Chrome Soccer")
 
 # Set initial score
@@ -303,26 +303,26 @@ while run:
     enemy.rect.centery = int(enemy_data[4:])
 
     # Fill the background
-    win.fill((0,0,0))
-    win.blit(BackGround.image, BackGround.rect)
+    screen.fill((0,0,0))
+    screen.blit(BackGround.image, BackGround.rect)
 
     # Draw all the sprites, re-draw the goals, re-draw the score, and update the screen
     all_sprites_list.draw(screen)
     pygame.draw.rect(screen, RED, (-20, screen_height//2 - 150, 60, 300))
     pygame.draw.rect(screen, BLUE, (screen_width - 40, screen_height//2 - 150, 60, 300))
     if (me.color == RED):
-        message_display(str(me_score) + " - " + str(enemy_score), win, 30, screen_width/2, 20)
+        message_display(str(me_score) + " - " + str(enemy_score), screen, 30, screen_width/2, 20)
     else:
-        message_display(str(enemy_score) + " - " + str(me_score), win, 30, screen_width/2, 20)
+        message_display(str(enemy_score) + " - " + str(me_score), screen, 30, screen_width/2, 20)
     pygame.display.flip()
     pygame.display.update()
 
     if (enemy_score == 5):
-        message_display("You Lose!", win, 115, screen_width/2, screen_height/2)
+        message_display("You Lose!", screen, 115, screen_width/2, screen_height/2)
         pygame.time.delay(2000)
         break
     if (me_score == 5):
-        message_display("You Win!", win, 115, screen_width/2, screen_height/2)
+        message_display("You Win!", screen, 115, screen_width/2, screen_height/2)
         pygame.time.delay(2000)
         break
 
