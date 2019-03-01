@@ -84,6 +84,11 @@ class Ball(pygame.sprite.Sprite):
         self.rect.x = screen_width//2 - ball_side//2
         self.rect.y = screen_height//2 - ball_side//2
 
+    def make_data_package(self):
+        datax = str(self.rect.centerx).rjust(4, '0')
+        datay = str(self.rect.centery).rjust(4, '0')
+        return datax + datay
+
 class Goal(pygame.sprite.Sprite):
     
     def __init__(self, color, x, y):
@@ -221,18 +226,6 @@ while True:
             ball_dir = 'u'
         else:
             ball_dir = 'd'
-    
-    # Move the ball
-    if (ball_dir == 'd'):
-        ball.rect.y += ball_vel
-    elif (ball_dir == 'u'):
-        ball.rect.y -= ball_vel
-    elif (ball_dir == 'r'):
-        ball.rect.x += ball_vel
-    elif (ball_dir == 'l'):
-        ball.rect.x -= ball_vel
-    if (ball_vel > 0):
-        ball_vel -= 1
 
     # Get the key pressed
     keys = pygame.key.get_pressed()
@@ -285,14 +278,38 @@ while True:
     if (enemy_goal_made):
         me_score = me_score + 1
 
-    # Data Transfer
+    # Send my position to the enemy
     me_data = me.make_data_package()
-    connection.send(me_data, OTHER_HOST, OTHER_PORT) # the send code
+    connection.send(me_data, OTHER_HOST, OTHER_PORT)
 
-    enemy_data = server.receive() # the receive code
-    
+    # Receive the enemy's position
+    enemy_data = server.receive()
     enemy.rect.centerx = int(enemy_data[:4])
     enemy.rect.centery = int(enemy_data[4:])
+
+    # If RED player, calculate ball's new position and send it to the enemy
+    if (me.color == RED):
+
+        # Calculate ball's new position
+        if (ball_dir == 'd'):
+            ball.rect.y += ball_vel
+        elif (ball_dir == 'u'):
+            ball.rect.y -= ball_vel
+        elif (ball_dir == 'r'):
+            ball.rect.x += ball_vel
+        elif (ball_dir == 'l'):
+            ball.rect.x -= ball_vel
+        if (ball_vel > 0):
+            ball_vel -= 1
+
+        # Send it to the enemy
+        ball_data = ball.make_data_packege()
+        connection.send(ball_data, OTHER_HOST, OTHER_PORT)
+
+    # If BLUE player, receive the ball's new position from the enemy
+    ball_data = server.receive()
+    ball.rect.centerx = int(enemy_data[:4])
+    ball.rect.centery = int(enemy_data[4:])
 
     # Fill the background
     screen.fill((0,0,0))
