@@ -4,14 +4,6 @@ import connection
 # Initialize pygame
 pygame.init()
 
-""" This demonstrates a two-player game to be played from two different PCs
-    connected to a local network (LAN) or even via the Internet. The code
-    requeres access to the module 'connection' for handling of generel server
-    and client code.
-
-    Data send between the two players must be 'string'-format.
-"""
-
 #####################################################################
 ## --- NEXT 4 LINES MUST BE MODIFIED TO MATCH ACTUAL SITUATION --- ##
 MY_SERVER_HOST = '192.168.0.14'
@@ -20,29 +12,30 @@ OTHER_HOST = '192.168.0.19'
 OTHER_PORT = 9992
 #####################################################################
 
+# Set colors
 RED = (255, 0, 0)
 BLUE = (0, 0, 255)
 GREEN = (0, 255, 0)
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 
+# Set screen dimensions
 screen_width = 852
 screen_height = 480
+
+# Set player and ball dimensions
 player_side = 50
 ball_side = 75
+
+# Set goal dimensions
 goal_width = 30
 goal_height = 300
 
-offset = player_side//2
+# Set initial positions of players
 redx = 100
 redy = screen_height//2
 bluex = screen_width - 100
 bluey = screen_height//2
-
-WHITE = (255, 255, 255)
-RED = (255, 0, 0)
-BLUE = (0, 0, 255)
-
 
 class Player(pygame.sprite.Sprite):
     
@@ -176,7 +169,7 @@ all_sprites_list.add(ball)
 all_sprites_list.add(me_goal)
 all_sprites_list.add(enemy_goal)
 
-# Connect to the other host
+# Set up my server
 server = connection.Server(MY_SERVER_HOST, MY_SERVER_PORT)
 
 # Set the field background
@@ -197,9 +190,8 @@ ball_dir = 'u'
 #######################################################################
 ####                       MAIN GAME LOOP                          ####
 #######################################################################
-
-run = True     
-while run:
+    
+while True:
 
     # If they pressed the 'X' close the game
     for event in pygame.event.get():
