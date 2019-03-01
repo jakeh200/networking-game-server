@@ -206,14 +206,46 @@ while True:
             sys.exit()
 
     # change the ball's direction if it hit a wall
-    if (ball.rect.x < 2*ball_side):
+    # If the ball goes too far to the left
+    if (ball.rect.x < ball_side):
         ball_dir = 'r'
-    if (ball.rect.y < 2*ball_side):
+        # If the player is pushing the ball too much, make it go up or down
+        if (ball.rect.x < ball_side//2):
+            k = random.randint(0,1)
+            if (k == 0):
+                ball_dir = 'u'
+            else:
+                ball_dir = 'd'
+    # If the ball goes too high up
+    if (ball.rect.y < ball_side):
         ball_dir = 'd'
-    if (ball.rect.x > screen_width - 2*ball_side):
+        # If the player is pushing the ball too much, make it go right or left
+        if (ball.rect.y < ball_side//2):
+            k = random.randint(0,1)
+            if (k == 0):
+                ball_dir = 'r'
+            else:
+                ball_dir = 'l'
+    # If the ball goes too far to the right
+    if (ball.rect.x > screen_width - ball_side):
         ball_dir = 'l'
-    if (ball.rect.y > screen_height - 2*ball_side):
+        # If the player is pushing the ball too much, make it go up or down
+        if (ball.rect.x > screen_width - ball_side//2):
+            k = random.randint(0,1)
+            if (k == 0):
+                ball_dir = 'u'
+            else:
+                ball_dir = 'd'
+    # If the ball goes too far down
+    if (ball.rect.y > screen_height - ball_side):
         ball_dir = 'u'
+        # If the player is pushing the ball too much, make it go right or left
+        if (ball.rect.y > screen_height - ball_side//2):
+            k = random.randint(0,1)
+            if (k == 0):
+                ball_dir = 'r'
+            else:
+                ball_dir = 'l'
 
     # change the ball's direction if it gets too close to the center of a player
     xdiff_me = abs(me.rect.x - ball.rect.x)
