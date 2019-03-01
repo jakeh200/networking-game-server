@@ -1,5 +1,5 @@
 import pygame, random, sys, socket
-import Server
+import connection
 
 # Initialize pygame
 pygame.init()
@@ -15,9 +15,9 @@ pygame.init()
 #####################################################################
 ## --- NEXT 4 LINES MUST BE MODIFIED TO MATCH ACTUAL SITUATION --- ##
 MY_SERVER_HOST = '192.168.0.14'
-MY_SERVER_PORT = 9999
+MY_SERVER_PORT = 8999
 OTHER_HOST = '192.168.0.19'
-OTHER_PORT = 9992
+OTHER_PORT = 8992
 #####################################################################
 
 RED = (255, 0, 0)
