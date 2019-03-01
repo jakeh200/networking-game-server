@@ -254,14 +254,14 @@ while True:
         xdiff = abs(player_x - ball.rect.x)
         ydiff = abs(player_y - ball.rect.y)
         if (xdiff > ydiff): # The ball is being hit along the x axis
-            if (player_x < ball.rect.x and ball.rect.x > ball_side): # Move ball to the right
+            if (player_x < ball.rect.x): # Move ball to the right
                 ball_dir = 'r'
-            else if (ball.rect.x < screen_width - ball_side):   # Move ball to the left
+            else:   # Move ball to the left
                 ball_dir = 'l'
         else: # The ball is being hit along the y axis
-            if (player_y < ball.rect.y and ball.rect.y > ball_side): # Move the ball down
+            if (player_y < ball.rect.y): # Move the ball down
                 ball_dir = 'd'
-            else if (ball.rect.y < screen_height - ball_side):   # Move the ball up
+            else:   # Move the ball up
                 ball_dir = 'u'
 
     # Check if the ball hit either goal
@@ -291,14 +291,18 @@ while True:
     if (me.color == RED):
 
         # Calculate ball's new position
-        if (ball_dir == 'd'):
-            ball.rect.y += ball_vel
-        elif (ball_dir == 'u'):
-            ball.rect.y -= ball_vel
-        elif (ball_dir == 'r'):
-            ball.rect.x += ball_vel
-        elif (ball_dir == 'l'):
-            ball.rect.x -= ball_vel
+        new_y_d = ball.rect.y + ball_vel
+        new_y_u = ball.rect.y - ball_vel
+        new_x_r = ball.rect.x + ball_vel
+        new_x_l = ball.rect.x - ball_vel
+        if (ball_dir == 'd' and new_y_d < screen_height - ball_side):
+            ball.rect.y = new_y_d
+        elif (ball_dir == 'u' and new_y_u > ball_side):
+            ball.rect.y = new_y_u
+        elif (ball_dir == 'r' and new_x_r < screen_width - ball_side):
+            ball.rect.x = new_x_r
+        elif (ball_dir == 'l' and new_x_l > ball_side):
+            ball.rect.x = new_x_l
         if (ball_vel > 0):
             ball_vel -= 1
 
