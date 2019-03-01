@@ -206,21 +206,14 @@ while True:
             sys.exit()
 
     # change the ball's direction if it hit a wall
-##    if (ball.rect.x < ball_side):
-##        ball_dir = 'r'
-##    if (ball.rect.y < ball_side):
-##        ball_dir = 'd'
-##    if (ball.rect.x > screen_width - ball_side):
-##        ball_dir = 'l'
-##    if (ball.rect.y > screen_height - ball_side):
-##        ball_dir = 'u'
-
-    # make the ball stop if it hits a wall
-    if (ball.rect.x < ball_side ||
-        ball.rect.y < ball_side ||
-        ball.rect.x > screen_width - ball_side ||
-        ball.rect.y > screen_height - ball_side):
-        ball_vel = 0
+    if (ball.rect.x < ball_side):
+        ball_dir = 'r'
+    if (ball.rect.y < ball_side):
+        ball_dir = 'd'
+    if (ball.rect.x > screen_width - ball_side):
+        ball_dir = 'l'
+    if (ball.rect.y > screen_height - ball_side):
+        ball_dir = 'u'
 
     # change the ball's direction if it gets too close to the center of a player
     xdiff_me = abs(me.rect.x - ball.rect.x)
@@ -261,14 +254,14 @@ while True:
         xdiff = abs(player_x - ball.rect.x)
         ydiff = abs(player_y - ball.rect.y)
         if (xdiff > ydiff): # The ball is being hit along the x axis
-            if (player_x < ball.rect.x): # Move ball to the right
+            if (player_x < ball.rect.x and ball.rect.x > ball_side): # Move ball to the right
                 ball_dir = 'r'
-            else:   # Move ball to the left
+            else if (ball.rect.x < screen_width - ball_side):   # Move ball to the left
                 ball_dir = 'l'
         else: # The ball is being hit along the y axis
-            if (player_y < ball.rect.y): # Move the ball down
+            if (player_y < ball.rect.y and ball.rect.y > ball_side): # Move the ball down
                 ball_dir = 'd'
-            else:   # Move the ball up
+            else if (ball.rect.y < screen_height - ball_side):   # Move the ball up
                 ball_dir = 'u'
 
     # Check if the ball hit either goal
