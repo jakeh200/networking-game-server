@@ -206,13 +206,13 @@ while True:
             sys.exit()
 
     # change the ball's direction if it hit a wall
-    if (ball.rect.x < ball_side):
+    if (ball.rect.x < 2*ball_side):
         ball_dir = 'r'
-    if (ball.rect.y < ball_side):
+    if (ball.rect.y < 2*ball_side):
         ball_dir = 'd'
-    if (ball.rect.x > screen_width - ball_side):
+    if (ball.rect.x > screen_width - 2*ball_side):
         ball_dir = 'l'
-    if (ball.rect.y > screen_height - ball_side):
+    if (ball.rect.y > screen_height - 2*ball_side):
         ball_dir = 'u'
 
     # change the ball's direction if it gets too close to the center of a player
