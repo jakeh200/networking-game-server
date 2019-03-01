@@ -303,13 +303,14 @@ while True:
             ball_vel -= 1
 
         # Send it to the enemy
-        ball_data = ball.make_data_packege()
+        ball_data = ball.make_data_package()
         connection.send(ball_data, OTHER_HOST, OTHER_PORT)
 
     # If BLUE player, receive the ball's new position from the enemy
-    ball_data = server.receive()
-    ball.rect.centerx = int(enemy_data[:4])
-    ball.rect.centery = int(enemy_data[4:])
+    if (me.color == BLUE):
+        ball_data = server.receive()
+        ball.rect.centerx = int(ball_data[:4])
+        ball.rect.centery = int(ball_data[4:])
 
     # Fill the background
     screen.fill((0,0,0))
