@@ -116,15 +116,9 @@ class Background(pygame.sprite.Sprite):
 
 def reset_sprites(me, enemy, ball):
     if (me.color == RED):
-        me.rect.x = redx
-        me.rect.y = redy
-        enemy.rect.x = bluex
-        enemy.rect.y = bluey
+        me.rect = me.image.get_rect(center = (redx, redy))
     else:
-        me.rect.x = bluex
-        me.rect.y = bluey
-        enemy.rect.x = redx
-        enemy.rect.y = redy
+        me.rect = me.image.get_rect(center = (bluex, bluey))
     ball.rect.x = screen_width//2 - ball_side//2
     ball.rect.y = screen_height//2 - ball_side//2
 
