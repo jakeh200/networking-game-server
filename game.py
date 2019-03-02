@@ -158,6 +158,17 @@ def define_players_and_goals():
 # Create the play window
 screen = pygame.display.set_mode((screen_width, screen_height))
 
+# Fill the background with the waiting screen
+screen.fill((34,139,34))
+message_display("Chrome Soccer", screen, 60, screen_width//2, screen_height//2 - 50)
+message_display("Waiting for opponent...", screen, 25, screen_width//2, screen_height//2)
+init_ball = Ball()
+init_ball.rect = init_ball.image.get_rect(center = (screen_width//2, screen_height//2 + 50))
+s_list = pygame.sprite.Group()
+s_list.add(init_ball)
+s_list.draw(screen)
+pygame.display.update()
+
 # Define the players, goals, and ball
 me, enemy, me_goal, enemy_goal = define_players_and_goals()
 ball = Ball()
