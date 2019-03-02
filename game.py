@@ -141,14 +141,14 @@ def ip_value(ip):
 def define_players_and_goals():
     if ip_value(MY_SERVER_HOST) > ip_value(OTHER_HOST):
         me = Player((redx, redy), RED)
-        me_goal = Goal(RED, 0, screen_height//2 - 125)
+        me_goal = Goal(RED, 10, screen_height//2 - 125)
         enemy = Player((bluex, bluey), BLUE)
         enemy_goal = Goal(BLUE, screen_width + 20, screen_height//2 - 125)
     else:
         me = Player((bluex, bluey), BLUE)
         me_goal = Goal(BLUE, screen_width + 20, screen_height//2 - 125)
         enemy = Player((redx, redy), RED)
-        enemy_goal = Goal(RED, 0, screen_height//2 - 125)
+        enemy_goal = Goal(RED, 10, screen_height//2 - 125)
     return me, enemy, me_goal, enemy_goal
 
 #######################################################################
