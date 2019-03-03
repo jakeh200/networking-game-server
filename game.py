@@ -210,28 +210,6 @@ while True:
             pygame.quit()
             sys.exit()
 
-    # change the ball's direction if it hit a wall
-    if (ball.rect.x < 5):
-        ball_dir = 'r'
-    if (ball.rect.y < 5):
-        ball_dir = 'd'
-    if (ball.rect.x > screen_width - ball_side):
-        ball_dir = 'l'
-    if (ball.rect.y > screen_height - ball_side):
-        ball_dir = 'u'
-
-    # change the ball's direction if it gets too close to the center of a player
-    xdiff_me = abs(me.rect.x - ball.rect.x)
-    xdiff_enemy = abs(enemy.rect.x - ball.rect.x)
-    ydiff_me = abs(me.rect.y - ball.rect.y)
-    ydiff_enemy = abs(enemy.rect.y - ball.rect.y)
-    if ((xdiff_me < 40 and ydiff_me < 40) or (xdiff_enemy < 40 and ydiff_enemy < 40)):
-        k = random.randint(0,1)
-        if (k == 0):
-            ball_dir = 'u'
-        else:
-            ball_dir = 'd'
-
     # Get the key pressed
     keys = pygame.key.get_pressed()
 
@@ -268,6 +246,28 @@ while True:
                 ball_dir = 'd'
             else:   # Move the ball up
                 ball_dir = 'u'
+
+    # change the ball's direction if it hit a wall
+    if (ball.rect.x < 5):
+        ball_dir = 'r'
+    if (ball.rect.y < 5):
+        ball_dir = 'd'
+    if (ball.rect.x > screen_width - ball_side):
+        ball_dir = 'l'
+    if (ball.rect.y > screen_height - ball_side):
+        ball_dir = 'u'
+
+    # change the ball's direction if it gets too close to the center of a player
+    xdiff_me = abs(me.rect.x - ball.rect.x)
+    xdiff_enemy = abs(enemy.rect.x - ball.rect.x)
+    ydiff_me = abs(me.rect.y - ball.rect.y)
+    ydiff_enemy = abs(enemy.rect.y - ball.rect.y)
+    if ((xdiff_me < 40 and ydiff_me < 40) or (xdiff_enemy < 40 and ydiff_enemy < 40)):
+        k = random.randint(0,1)
+        if (k == 0):
+            ball_dir = 'u'
+        else:
+            ball_dir = 'd'
 
     # Check if the ball hit either goal
     me_goal_made = pygame.sprite.collide_rect(ball, me_goal)
