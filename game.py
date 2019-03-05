@@ -1,16 +1,8 @@
 import pygame, random, sys, socket
-import Server
+import connection
 
 # Initialize pygame
 pygame.init()
-
-""" This demonstrates a two-player game to be played from two different PCs
-    connected to a local network (LAN) or even via the Internet. The code
-    requeres access to the module 'connection' for handling of generel server
-    and client code.
-
-    Data send between the two players must be 'string'-format.
-"""
 
 #####################################################################
 ## --- NEXT 4 LINES MUST BE MODIFIED TO MATCH ACTUAL SITUATION --- ##
@@ -20,31 +12,30 @@ OTHER_HOST = '192.168.0.19'
 OTHER_PORT = 9992
 #####################################################################
 
+# Set colors
 RED = (255, 0, 0)
 BLUE = (0, 0, 255)
 GREEN = (0, 255, 0)
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 
+# Set screen dimensions
 screen_width = 852
 screen_height = 480
+
+# Set player and ball dimensions
 player_side = 50
 ball_side = 75
+
+# Set goal dimensions
 goal_width = 30
 goal_height = 300
 
-offset = player_side//2
+# Set initial positions of players
 redx = 100
 redy = screen_height//2
 bluex = screen_width - 100
 bluey = screen_height//2
-
-screen = pygame.display.set_mode((screen_width, screen_height))
-
-WHITE = (255, 255, 255)
-RED = (255, 0, 0)
-BLUE = (0, 0, 255)
-
 
 class Player(pygame.sprite.Sprite):
     
@@ -93,6 +84,11 @@ class Ball(pygame.sprite.Sprite):
         self.rect.x = screen_width//2 - ball_side//2
         self.rect.y = screen_height//2 - ball_side//2
 
+    def make_data_package(self):
+        datax = str(self.rect.centerx).rjust(4, '0')
+        datay = str(self.rect.centery).rjust(4, '0')
+        return datax + datay
+
 class Goal(pygame.sprite.Sprite):
     
     def __init__(self, color, x, y):
@@ -120,15 +116,9 @@ class Background(pygame.sprite.Sprite):
 
 def reset_sprites(me, enemy, ball):
     if (me.color == RED):
-        me.rect.x = redx
-        me.rect.y = redy
-        enemy.rect.x = bluex
-        enemy.rect.y = bluey
+        me.rect = me.image.get_rect(center = (redx, redy))
     else:
-        me.rect.x = bluex
-        me.rect.y = bluey
-        enemy.rect.x = redx
-        enemy.rect.y = redy
+        me.rect = me.image.get_rect(center = (bluex, bluey))
     ball.rect.x = screen_width//2 - ball_side//2
     ball.rect.y = screen_height//2 - ball_side//2
 
@@ -151,19 +141,33 @@ def ip_value(ip):
 def define_players_and_goals():
     if ip_value(MY_SERVER_HOST) > ip_value(OTHER_HOST):
         me = Player((redx, redy), RED)
-        me_goal = Goal(RED, 0, screen_height//2 - 125)
+        me_goal = Goal(RED, 10, screen_height//2 - 125)
         enemy = Player((bluex, bluey), BLUE)
         enemy_goal = Goal(BLUE, screen_width + 20, screen_height//2 - 125)
     else:
         me = Player((bluex, bluey), BLUE)
         me_goal = Goal(BLUE, screen_width + 20, screen_height//2 - 125)
         enemy = Player((redx, redy), RED)
-        enemy_goal = Goal(RED, 0, screen_height//2 - 125)
+        enemy_goal = Goal(RED, 10, screen_height//2 - 125)
     return me, enemy, me_goal, enemy_goal
 
 #######################################################################
 ####                           GAME SETUP                          ####
 #######################################################################
+
+# Create the play window
+screen = pygame.display.set_mode((screen_width, screen_height))
+
+# Fill the background with the waiting screen
+screen.fill((34,139,34))
+message_display("Chrome Soccer", screen, 60, screen_width//2, screen_height//2 - 50)
+message_display("Waiting for opponent...", screen, 25, screen_width//2, screen_height//2)
+init_ball = Ball()
+init_ball.rect = init_ball.image.get_rect(center = (screen_width//2, screen_height//2 + 50))
+s_list = pygame.sprite.Group()
+s_list.add(init_ball)
+s_list.draw(screen)
+pygame.display.update()
 
 # Define the players, goals, and ball
 me, enemy, me_goal, enemy_goal = define_players_and_goals()
@@ -175,12 +179,11 @@ all_sprites_list.add(ball)
 all_sprites_list.add(me_goal)
 all_sprites_list.add(enemy_goal)
 
-# Connect to the other host
+# Set up my server
 server = connection.Server(MY_SERVER_HOST, MY_SERVER_PORT)
 
 # Set the field background
 BackGround = Background('field.jpg', [0,0])
-win = pygame.display.set_mode((852, 480))
 pygame.display.set_caption("Chrome Soccer")
 
 # Set initial score
@@ -197,9 +200,8 @@ ball_dir = 'u'
 #######################################################################
 ####                       MAIN GAME LOOP                          ####
 #######################################################################
-
-run = True     
-while run:
+    
+while True:
 
     # If they pressed the 'X' close the game
     for event in pygame.event.get():
@@ -207,40 +209,6 @@ while run:
             #server.shutdown()
             pygame.quit()
             sys.exit()
-
-    # change the ball's direction if it hit a wall
-    if (ball.rect.x < 0):
-        ball_dir = 'r'
-    if (ball.rect.y < 0):
-        ball_dir = 'd'
-    if (ball.rect.x > screen_width - ball_side):
-        ball_dir = 'l'
-    if (ball.rect.y > screen_height - ball_side):
-        ball_dir = 'u'
-
-    # change the ball's direction if it gets too close to the center of a player
-    xdiff_me = abs(me.rect.x - ball.rect.x)
-    xdiff_enemy = abs(enemy.rect.x - ball.rect.x)
-    ydiff_me = abs(me.rect.y - ball.rect.y)
-    ydiff_enemy = abs(enemy.rect.y - ball.rect.y)
-    if ((xdiff_me < 40 and ydiff_me < 40) or (xdiff_enemy < 40 and ydiff_enemy < 40)):
-        k = random.randint(0,1)
-        if (k == 0):
-            ball_dir = 'u'
-        else:
-            ball_dir = 'd'
-    
-    # Move the ball
-    if (ball_dir == 'd'):
-        ball.rect.y += ball_vel
-    elif (ball_dir == 'u'):
-        ball.rect.y -= ball_vel
-    elif (ball_dir == 'r'):
-        ball.rect.x += ball_vel
-    elif (ball_dir == 'l'):
-        ball.rect.x -= ball_vel
-    if (ball_vel > 0):
-        ball_vel -= 1
 
     # Get the key pressed
     keys = pygame.key.get_pressed()
@@ -279,6 +247,28 @@ while run:
             else:   # Move the ball up
                 ball_dir = 'u'
 
+    # change the ball's direction if it hit a wall
+    if (ball.rect.x < 5):
+        ball_dir = 'r'
+    if (ball.rect.y < 5):
+        ball_dir = 'd'
+    if (ball.rect.x > screen_width - ball_side):
+        ball_dir = 'l'
+    if (ball.rect.y > screen_height - ball_side):
+        ball_dir = 'u'
+
+    # change the ball's direction if it gets too close to the center of a player
+    xdiff_me = abs(me.rect.x - ball.rect.x)
+    xdiff_enemy = abs(enemy.rect.x - ball.rect.x)
+    ydiff_me = abs(me.rect.y - ball.rect.y)
+    ydiff_enemy = abs(enemy.rect.y - ball.rect.y)
+    if ((xdiff_me < 40 and ydiff_me < 40) or (xdiff_enemy < 40 and ydiff_enemy < 40)):
+        k = random.randint(0,1)
+        if (k == 0):
+            ball_dir = 'u'
+        else:
+            ball_dir = 'd'
+
     # Check if the ball hit either goal
     me_goal_made = pygame.sprite.collide_rect(ball, me_goal)
     enemy_goal_made = pygame.sprite.collide_rect(ball, enemy_goal)
@@ -293,36 +283,65 @@ while run:
     if (enemy_goal_made):
         me_score = me_score + 1
 
-    # Data Transfer
+    # Send my position to the enemy
     me_data = me.make_data_package()
-    connection.send(me_data, OTHER_HOST, OTHER_PORT) # the send code
+    connection.send(me_data, OTHER_HOST, OTHER_PORT)
 
-    enemy_data = server.receive() # the receive code
-    
+    # Receive the enemy's position
+    enemy_data = server.receive()
     enemy.rect.centerx = int(enemy_data[:4])
     enemy.rect.centery = int(enemy_data[4:])
 
+    # If RED player, calculate ball's new position and send it to the enemy
+    if (me.color == RED):
+
+        # Calculate ball's new position
+        new_y_d = ball.rect.y + ball_vel
+        new_y_u = ball.rect.y - ball_vel
+        new_x_r = ball.rect.x + ball_vel
+        new_x_l = ball.rect.x - ball_vel
+        if (ball_dir == 'd' and new_y_d < screen_height - ball_side):
+            ball.rect.y = new_y_d
+        elif (ball_dir == 'u' and new_y_u > 0):
+            ball.rect.y = new_y_u
+        elif (ball_dir == 'r' and new_x_r < screen_width - ball_side):
+            ball.rect.x = new_x_r
+        elif (ball_dir == 'l' and new_x_l > 0):
+            ball.rect.x = new_x_l
+        if (ball_vel > 0):
+            ball_vel -= 1
+
+        # Send it to the enemy
+        ball_data = ball.make_data_package()
+        connection.send(ball_data, OTHER_HOST, OTHER_PORT)
+
+    # If BLUE player, receive the ball's new position from the enemy
+    if (me.color == BLUE):
+        ball_data = server.receive()
+        ball.rect.centerx = int(ball_data[:4])
+        ball.rect.centery = int(ball_data[4:])
+
     # Fill the background
-    win.fill((0,0,0))
-    win.blit(BackGround.image, BackGround.rect)
+    screen.fill((0,0,0))
+    screen.blit(BackGround.image, BackGround.rect)
 
     # Draw all the sprites, re-draw the goals, re-draw the score, and update the screen
     all_sprites_list.draw(screen)
     pygame.draw.rect(screen, RED, (-20, screen_height//2 - 150, 60, 300))
     pygame.draw.rect(screen, BLUE, (screen_width - 40, screen_height//2 - 150, 60, 300))
     if (me.color == RED):
-        message_display(str(me_score) + " - " + str(enemy_score), win, 30, screen_width/2, 20)
+        message_display(str(me_score) + " - " + str(enemy_score), screen, 30, screen_width/2, 20)
     else:
-        message_display(str(enemy_score) + " - " + str(me_score), win, 30, screen_width/2, 20)
+        message_display(str(enemy_score) + " - " + str(me_score), screen, 30, screen_width/2, 20)
     pygame.display.flip()
     pygame.display.update()
 
     if (enemy_score == 5):
-        message_display("You Lose!", win, 115, screen_width/2, screen_height/2)
+        message_display("You Lose!", screen, 115, screen_width/2, screen_height/2)
         pygame.time.delay(2000)
         break
     if (me_score == 5):
-        message_display("You Win!", win, 115, screen_width/2, screen_height/2)
+        message_display("You Win!", screen, 115, screen_width/2, screen_height/2)
         pygame.time.delay(2000)
         break
 
