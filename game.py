@@ -64,9 +64,10 @@ class Player(pygame.sprite.Sprite):
 			self.rect.centerx += 10
 
 	def make_data_package(self):
+		package_id = 'p'
 		datax = str(self.rect.centerx).rjust(4, '0')
 		datay = str(self.rect.centery).rjust(4, '0')
-		return datax + datay
+		return package_id + datax + datay
 
 class Ball(pygame.sprite.Sprite):
  
@@ -88,9 +89,10 @@ class Ball(pygame.sprite.Sprite):
 		self.rect.y = screen_height//2 - ball_side//2
 
 	def make_data_package(self):
+		package_id = 'b'
 		datax = str(self.rect.centerx).rjust(4, '0')
 		datay = str(self.rect.centery).rjust(4, '0')
-		return datax + datay
+		return package_id + datax + datay
 
 class Goal(pygame.sprite.Sprite):
 	
@@ -340,14 +342,17 @@ while True:
 
 	# Send my position to the enemy
 	me_data = me.make_data_package()
-	#print("Sending my position")
 	Server.send(me_data, OTHER_HOST, OTHER_PORT)
 
 	# Receive the enemy's position
 	enemy_data = server.receive_update()
-	#print("Received enemy position")
-	enemy.rect.centerx = int(enemy_data[:4])
-	enemy.rect.centery = int(enemy_data[4:])
+	package_id = enemy_data[0]
+	if (package_id == 'p'): # Should be the enemy's position
+		enemy.rect.centerx = int(enemy_data[1:5])
+		enemy.rect.centery = int(enemy_data[5:])
+	elif (package_id == 'b'): # Might be the ball's position
+		ball.rect.centerx = int(enemy_data[1:5])
+		ball.rect.centery = int(enemy_data[5:])
 
 	# If RED player, calculate ball's new position and send it to the enemy
 	if (me.color == RED):
@@ -367,19 +372,21 @@ while True:
 			ball.rect.x = new_x_l
 		if (ball_vel > 0):
 			ball_vel -= 1
-		#print("Sending ball data to enemy.")
+			
 		# Send it to the enemy
 		ball_data = ball.make_data_package()
 		Server.send(ball_data, OTHER_HOST, OTHER_PORT)
-		#print("sent ball data to enemy.")
 
 	# If BLUE player, receive the ball's new position from the enemy
 	else:
-		#print("Attempting to receive ball data.")
 		ball_data = server.receive_update()
-		#print("received ball data")
-		ball.rect.centerx = int(ball_data[:4])
-		ball.rect.centery = int(ball_data[4:])
+		package_id = ball_data[0]
+		if (package_id == 'b'): # Should be the ball's position
+			ball.rect.centerx = int(ball_data[1:5])
+			ball.rect.centery = int(ball_data[5:])
+		elif (package_id == 'p'): # Might be the enemy's position
+			enemy.rect.centerx = int(ball_data[1:5])
+			enemy.rect.centery = int(ball_data[5:])
 
 	# Fill the background
 	screen.fill((0,0,0))
@@ -387,8 +394,8 @@ while True:
 
 	# Draw all the sprites, re-draw the goals, re-draw the score, and update the screen
 	all_sprites_list.draw(screen)
-	#pygame.draw.rect(screen, RED, (-20, screen_height//2 - 150, 60, 300))
-	#pygame.draw.rect(screen, BLUE, (screen_width - 40, screen_height//2 - 150, 60, 300))
+	pygame.draw.rect(screen, RED, (-20, screen_height//2 - 150, 60, 300))
+	pygame.draw.rect(screen, BLUE, (screen_width - 40, screen_height//2 - 150, 60, 300))
 	if (me.color == RED):
 		message_display(str(me_score) + " - " + str(enemy_score), screen, 30, screen_width/2, 20)
 	else:
