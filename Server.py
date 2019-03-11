@@ -11,8 +11,8 @@ class Client():
 		#self.sock.settimeout(20)
 		try:
 			self.sock.connect((ip, port))
-		except socket.timeout:
-			print('Timed out trying to connect.\n')
+		except socket.error:
+			print('There was an error trying to connect.\n')
 
 	def receive(self):
 		data = None
@@ -39,9 +39,10 @@ class Server():
 		self.match_sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 		self.match_sock.bind((ip, match_port))
 		self.match_sock.listen(backlog)
-
+		#clients is list of ip address, port tuples
 		self.lock = threading.Lock()
-		self.clients = queue.Queue()
+		self.client_queue = queue.Queue()
+		self.clients = []
 		self.matches = []
 
 	def receive_update(self):
@@ -54,7 +55,8 @@ class Server():
 	def receive_conn(self):
 		client, addr = self.match_sock.accept()
 		self.lock.acquire()
-		self.clients.put((client, addr))
+		self.client_queue.put((client, addr))
+		self.clients.append(addr)
 		self.lock.release()
 		return client, addr
 		#matchmake()
@@ -75,9 +77,9 @@ class Server():
 		#try to match for 60 seconds
 		while(not matched and time.time() - start < 20):
 			print("Time since start", time.time() - start)
-			if(self.clients.qsize() >= 2):
+			if(self.client_queue.qsize() >= 2):
 				#take first 2 clients in queue and create a new Match object
-				new_match = self.match(self.clients.get(), self.clients.get())
+				new_match = self.match(self.client_queue.get(), self.client_queue.get())
 				matched = True
 			else:
 				time.sleep(5)
@@ -89,7 +91,7 @@ class Server():
 		return new_match
 	
 	def clear_clients(self):
-		self.clients.queue.clear()
+		self.client_queue.queue.clear()
 
 	def clear_matches(self):
 		self.matches = []

@@ -142,7 +142,7 @@ def ip_value(ip):
 
 
 def define_players_and_goals():
-	if ip_value(MY_IP) > ip_value(OTHER_HOST) or MY_PORT > OTHER_PORT:
+	if (MY_PORT > OTHER_PORT):
 		me = Player((redx, redy), RED)
 		me_goal = Goal(RED, 10, screen_height//2 - 125)
 		enemy = Player((bluex, bluey), BLUE)
@@ -153,6 +153,22 @@ def define_players_and_goals():
 		enemy = Player((redx, redy), RED)
 		enemy_goal = Goal(RED, 10, screen_height//2 - 125)
 	return me, enemy, me_goal, enemy_goal
+
+#looks for match for 60 seconds
+def look_for_match():
+	print("Looking for match...\n")
+	matched = False
+	data = None
+	start = time.time()
+	while(not matched and time.time() - start < 60):
+		data = conn.receive()
+		if(data):
+			matched = True
+			return data
+		else:
+			time.sleep(5)
+
+	return data 
 
 #######################################################################
 ####                           GAME SETUP                          ####
@@ -193,22 +209,6 @@ ball_dir = 'u'
 
 conn = Server.Client(MY_SERVER_HOST, MY_SERVER_PORT)
 
-#looks for match for 60 seconds
-def look_for_match():
-	print("Looking for match...\n")
-	matched = False
-	data = None
-	start = time.time()
-	while(not matched and time.time() - start < 60):
-		data = conn.receive()
-		if(data):
-			matched = True
-			return data
-		else:
-			time.sleep(5)
-
-	return data 
-
 data = look_for_match()
 #match was not found
 if(data[0] == 'A'):
@@ -240,7 +240,7 @@ connected = False
 while(not connected):
 	if(MY_PORT > OTHER_PORT):
 		msg = server.receive_update()
-		#print(msg)
+		print(msg)
 		connected = True
 	else:
 		try:
@@ -340,10 +340,12 @@ while True:
 
 	# Send my position to the enemy
 	me_data = me.make_data_package()
+	#print("Sending my position")
 	Server.send(me_data, OTHER_HOST, OTHER_PORT)
 
 	# Receive the enemy's position
 	enemy_data = server.receive_update()
+	#print("Received enemy position")
 	enemy.rect.centerx = int(enemy_data[:4])
 	enemy.rect.centery = int(enemy_data[4:])
 
@@ -365,14 +367,17 @@ while True:
 			ball.rect.x = new_x_l
 		if (ball_vel > 0):
 			ball_vel -= 1
-
+		#print("Sending ball data to enemy.")
 		# Send it to the enemy
 		ball_data = ball.make_data_package()
 		Server.send(ball_data, OTHER_HOST, OTHER_PORT)
+		#print("sent ball data to enemy.")
 
 	# If BLUE player, receive the ball's new position from the enemy
-	if (me.color == BLUE):
+	else:
+		#print("Attempting to receive ball data.")
 		ball_data = server.receive_update()
+		#print("received ball data")
 		ball.rect.centerx = int(ball_data[:4])
 		ball.rect.centery = int(ball_data[4:])
 
