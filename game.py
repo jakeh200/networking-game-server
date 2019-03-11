@@ -7,9 +7,9 @@ pygame.init()
 
 #####################################################################
 ## --- NEXT 4 LINES MUST BE MODIFIED TO MATCH ACTUAL SITUATION --- ##
-MY_SERVER_HOST = '169.231.75.45'
+MY_SERVER_HOST = '192.168.0.14'
 MY_SERVER_PORT = 5000
-MY_IP = '169.231.75.45'
+MY_IP = '192.168.0.14'
 MY_PORT = 0
 OTHER_HOST = ''
 OTHER_PORT = 0
@@ -146,10 +146,10 @@ def define_players_and_goals():
 		me = Player((redx, redy), RED)
 		me_goal = Goal(RED, 10, screen_height//2 - 125)
 		enemy = Player((bluex, bluey), BLUE)
-		enemy_goal = Goal(BLUE, screen_width + 20, screen_height//2 - 125)
+		enemy_goal = Goal(BLUE, screen_width + 10, screen_height//2 - 125)
 	else:
 		me = Player((bluex, bluey), BLUE)
-		me_goal = Goal(BLUE, screen_width + 20, screen_height//2 - 125)
+		me_goal = Goal(BLUE, screen_width + 10, screen_height//2 - 125)
 		enemy = Player((redx, redy), RED)
 		enemy_goal = Goal(RED, 10, screen_height//2 - 125)
 	return me, enemy, me_goal, enemy_goal
@@ -387,8 +387,8 @@ while True:
 
 	# Draw all the sprites, re-draw the goals, re-draw the score, and update the screen
 	all_sprites_list.draw(screen)
-	pygame.draw.rect(screen, RED, (-20, screen_height//2 - 150, 60, 300))
-	pygame.draw.rect(screen, BLUE, (screen_width - 40, screen_height//2 - 150, 60, 300))
+	#pygame.draw.rect(screen, RED, (-20, screen_height//2 - 150, 60, 300))
+	#pygame.draw.rect(screen, BLUE, (screen_width - 40, screen_height//2 - 150, 60, 300))
 	if (me.color == RED):
 		message_display(str(me_score) + " - " + str(enemy_score), screen, 30, screen_width/2, 20)
 	else:
