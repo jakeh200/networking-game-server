@@ -1,5 +1,6 @@
 import pygame, random, sys, socket
 import Server, time
+from pythonping import ping
 
 
 # Initialize pygame
@@ -159,18 +160,32 @@ def define_players_and_goals():
 #looks for match for 60 seconds
 def look_for_match():
 	print("Looking for match...\n")
-	matched = False
 	data = None
+	match_found = False
 	start = time.time()
-	while(not matched and time.time() - start < 60):
+	index = 0
+	min_ping_index = 0
+	min_ping = 0
+	min_ping_opponent = ''
+	while(time.time() - start < 60):
 		data = conn.receive()
-		if(data):
-			matched = True
-			return data
-		else:
-			time.sleep(5)
+		if(data[0] == 'd'): # Server is done sending IP addresses of other clients to ping
+			break
+		else: # Data received is an IP address of a potential opponent.
+			response_list = ping(data, size=40, count=5)
+			print(str(index) + ") opponent: " + data + "ping: " + str(response_list.rtt_avg_ms))
+			if (response_list.rtt_avg_ms < min_ping):
+				min_ping = response_list.rtt_avg_ms
+				min_ping_index = index
+				min_ping_opponent = data
+				match_found = True
+		index = index + 1
 
-	return data 
+	if (match_found):
+		Server.send(str(min_ping_index).rjust(4, '0'), MY_SERVER_HOST, MY_SERVER_PORT)
+		return min_ping_opponent
+		
+	return ''
 
 #######################################################################
 ####                           GAME SETUP                          ####

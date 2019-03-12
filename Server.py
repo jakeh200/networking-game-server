@@ -65,6 +65,7 @@ class Server():
 	#matches first 2 clients in queue
 	#Will never be called by more than 1 thread at a time
 	def matchmake(self, addr):
+		print("matchmaking...")
 		#check if a match has been found for this address
 		for match in self.matches:
 			if(addr == match.get_player1_addr() or addr == match.get_player2_addr()):
@@ -77,9 +78,28 @@ class Server():
 		#try to match for 60 seconds
 		while(not matched and time.time() - start < 20):
 			print("Time since start", time.time() - start)
-			if(self.client_queue.qsize() >= 2):
-				#take first 2 clients in queue and create a new Match object
-				new_match = self.match(self.client_queue.get(), self.client_queue.get())
+			if(len(self.clients) >= 2):
+				# Send the first client the list of the rest of the clients
+				player1 = self.clients.pop(0)
+				player1_ip = player1[0]
+				player1_port = player1[1]
+				print("player 1 IP: " + player1_ip + " and port: " + str(player1_port))
+				for opponent in self.clients:
+					opponent_ip = opponent[0]
+					print("sending opponent " + opponent_ip)
+					########### ERROR WHEN SENDING 
+					send(opponent_ip, player1_ip, player1_port)
+				send("done", player1_ip, player1_port)
+
+				# Recieve the index of the opponent chosen by the player based on pings
+				conn = Server.Client(player1_ip, player1_port)
+				player2_index = int(conn.receive())
+				player2 = self.clients.pop(player2_index)
+				print("player chosen, IP: " + player2[0] + " port: " + str(player2[1]))
+				conn.close()
+				
+				# Take these two clients and create a new Match object
+				new_match = self.match(player1, player2)
 				matched = True
 			else:
 				time.sleep(5)
