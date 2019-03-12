@@ -56,7 +56,7 @@ class Server():
 		client, addr = self.match_sock.accept()
 		self.lock.acquire()
 		self.client_queue.put((client, addr))
-		self.clients.append(addr)
+		self.clients.append((client, addr))
 		self.lock.release()
 		return client, addr
 		#matchmake()
@@ -64,7 +64,7 @@ class Server():
 	#check if at least 2 players in queue
 	#matches first 2 clients in queue
 	#Will never be called by more than 1 thread at a time
-	def matchmake(self, addr):
+	def matchmake(self, addr, conn):
 		print("matchmaking...")
 		#check if a match has been found for this address
 		for match in self.matches:
@@ -80,23 +80,25 @@ class Server():
 			print("Time since start", time.time() - start)
 			if(len(self.clients) >= 2):
 				# Send the first client the list of the rest of the clients
+				# player1 = (client, addr)
 				player1 = self.clients.pop(0)
-				player1_ip = player1[0]
-				player1_port = player1[1]
-				conn = Client(player1_ip, player1_port)
+				player1_ip = player1[1][0]
+				player1_port = player1[1][0]
 				print("player 1 IP: " + player1_ip + " and port: " + str(player1_port))
 				for opponent in self.clients:
-					opponent_ip = opponent[0]
+					opponent_ip = opponent[1][0]
 					print("sending opponent " + opponent_ip)
 					########### ERROR WHEN SENDING 
-					conn.send(opponent_ip)
-				conn.send("done")
+					conn.send(opponent_ip.encode())
+				d = "done"
+				print(d)
+				conn.send(d.encode())
 
 				# Recieve the index of the opponent chosen by the player based on pings
-				player2_index = int(conn.receive())
+				data = conn.recv(payload).decode()
+				player2_index = int(data)
 				player2 = self.clients.pop(player2_index)
-				print("player chosen, IP: " + player2[0] + " port: " + str(player2[1]))
-				conn.close()
+				print(str(player2_index) + ") player chosen, IP: " + player2[1][0] + " port: " + str(player2[1][1]))
 				
 				# Take these two clients and create a new Match object
 				new_match = self.match(player1, player2)
@@ -108,6 +110,7 @@ class Server():
 		if(new_match not in self.matches and new_match != None):
 			self.matches.append(new_match)
 
+		print("matchmaking done")
 		return new_match
 	
 	def clear_clients(self):

@@ -17,7 +17,7 @@ def create_match(conn, addr):
 	start = time.time()
 	
 	lock.acquire()
-	match = server.matchmake(addr)
+	match = server.matchmake(addr, conn)
 	lock.release()
 
 	end = time.time()

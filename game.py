@@ -165,18 +165,21 @@ def look_for_match():
 	start = time.time()
 	index = 0
 	min_ping_index = 0
-	min_ping = 0
+	min_ping = 100000
 	min_ping_opponent = ''
 	while(time.time() - start < 60):
+		print("before receiving IP")
 		data = conn.receive()
+		print("after receiving IP, which is " + data)
 		if (data[0] == 'd'): # Server is done sending IP addresses of other clients to ping
 			break
 		elif (data[0] == 'n'):
-                        continue
+			continue
 		else: # Data received is an IP address of a potential opponent.
 			response_list = ping(data, size=40, count=5)
 			print(str(index) + ") opponent: " + data + "ping: " + str(response_list.rtt_avg_ms))
 			if (response_list.rtt_avg_ms < min_ping):
+				print("new minimum")
 				min_ping = response_list.rtt_avg_ms
 				min_ping_index = index
 				min_ping_opponent = data
@@ -184,10 +187,13 @@ def look_for_match():
 		index = index + 1
 
 	if (match_found):
-		Server.send(str(min_ping_index).rjust(4, '0'), MY_SERVER_HOST, MY_SERVER_PORT)
-		return min_ping_opponent
-		
-	return ''
+		print("MATCH FOUND, sending index " + str(min_ping_index))
+		#Server.send(str(min_ping_index).rjust(4, '0'), MY_SERVER_HOST, MY_SERVER_PORT)
+		conn.send(str(min_ping_index).rjust(4, '0'))
+
+        # Wait for confirmation of opponent
+	response = conn.receive()
+	return response
 
 #######################################################################
 ####                           GAME SETUP                          ####
