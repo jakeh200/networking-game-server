@@ -83,16 +83,16 @@ class Server():
 				player1 = self.clients.pop(0)
 				player1_ip = player1[0]
 				player1_port = player1[1]
+				conn = Client(player1_ip, player1_port)
 				print("player 1 IP: " + player1_ip + " and port: " + str(player1_port))
 				for opponent in self.clients:
 					opponent_ip = opponent[0]
 					print("sending opponent " + opponent_ip)
 					########### ERROR WHEN SENDING 
-					send(opponent_ip, player1_ip, player1_port)
-				send("done", player1_ip, player1_port)
+					conn.send(opponent_ip)
+				conn.send("done")
 
 				# Recieve the index of the opponent chosen by the player based on pings
-				conn = Server.Client(player1_ip, player1_port)
 				player2_index = int(conn.receive())
 				player2 = self.clients.pop(player2_index)
 				print("player chosen, IP: " + player2[0] + " port: " + str(player2[1]))

@@ -160,7 +160,7 @@ def define_players_and_goals():
 #looks for match for 60 seconds
 def look_for_match():
 	print("Looking for match...\n")
-	data = None
+	data = 'n'
 	match_found = False
 	start = time.time()
 	index = 0
@@ -169,8 +169,10 @@ def look_for_match():
 	min_ping_opponent = ''
 	while(time.time() - start < 60):
 		data = conn.receive()
-		if(data[0] == 'd'): # Server is done sending IP addresses of other clients to ping
+		if (data[0] == 'd'): # Server is done sending IP addresses of other clients to ping
 			break
+		elif (data[0] == 'n'):
+                        continue
 		else: # Data received is an IP address of a potential opponent.
 			response_list = ping(data, size=40, count=5)
 			print(str(index) + ") opponent: " + data + "ping: " + str(response_list.rtt_avg_ms))
