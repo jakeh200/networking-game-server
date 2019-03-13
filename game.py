@@ -7,9 +7,9 @@ pygame.init()
 
 #####################################################################
 ## --- NEXT 4 LINES MUST BE MODIFIED TO MATCH ACTUAL SITUATION --- ##
-MY_SERVER_HOST = '169.231.75.45'
+MY_SERVER_HOST = '169.231.111.165'
 MY_SERVER_PORT = 5000
-MY_IP = '169.231.75.45'
+MY_IP = '169.231.111.165'
 MY_PORT = 0
 OTHER_HOST = ''
 OTHER_PORT = 0

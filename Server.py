@@ -1,6 +1,7 @@
 import socket, sys
 import time
 import queue, threading
+from pythonping import ping
 
 payload = 2048
 backlog = 2
@@ -56,7 +57,7 @@ class Server():
 		client, addr = self.match_sock.accept()
 		self.lock.acquire()
 		self.client_queue.put((client, addr))
-		self.clients.append(addr)
+		self.clients.append((client, addr))
 		self.lock.release()
 		return client, addr
 		#matchmake()
@@ -78,9 +79,34 @@ class Server():
 		while(not matched and time.time() - start < 20):
 			print("Time since start", time.time() - start)
 			if(self.client_queue.qsize() >= 2):
-				#take first 2 clients in queue and create a new Match object
-				new_match = self.match(self.client_queue.get(), self.client_queue.get())
-				matched = True
+				# Ping all of the clients in the queue
+				# Match up the player with the quickest ping and the player with the slowest ping
+				max_ping = 0
+				min_ping = 100000
+				max_ping_player = None
+				min_ping_player = None
+				for player in self.clients:
+					ip_addr = player[1][0]
+					response_list = ping(ip_addr, size = 40, count = 5)
+					p = response_list.rtt_avg_ms
+					print("current player: " + ip_addr + " " + str(player[1][1]) + " ping: " + str(p))
+					if (p > max_ping):
+						print("NEW MAX")
+						max_ping = p
+						max_ping_player = player
+					if (p <= min_ping):
+						print("NEW MIN")
+						min_ping = p
+						min_ping_player = player
+				print("max_ping_player: " + max_ping_player[1][0] + " " + str(max_ping_player[1][1]))
+				print("min_ping_player: " + min_ping_player[1][0] + " " + str(min_ping_player[1][1]))
+							      
+				# Match the player with quickest ping with player with slowest ping
+				if (max_ping_player != min_ping_player):
+					new_match = self.match(max_ping_player, min_ping_player)
+					self.clients.remove(max_ping_player)
+					self.clients.remove(min_ping_player)
+					matched = True
 			else:
 				time.sleep(5)
 

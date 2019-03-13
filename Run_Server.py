@@ -4,7 +4,7 @@ import time
 import sys
 import socket
 
-MY_SERVER_HOST = '169.231.75.45'
+MY_SERVER_HOST = '169.231.111.165'
 MY_SERVER_PORT = 5000
 
 lock = threading.Lock()
