@@ -69,6 +69,9 @@ class Server():
 		#check if a match has been found for this address
 		for match in self.matches:
 			if(addr == match.get_player1_addr() or addr == match.get_player2_addr()):
+				print("previous match found")
+				d = "done"
+				conn.send(d.encode())
 				return match
 
 		matched = False
@@ -80,7 +83,6 @@ class Server():
 			print("Time since start", time.time() - start)
 			if(len(self.clients) >= 2):
 				# Send the first client the list of the rest of the clients
-				# player1 = (client, addr)
 				player1 = self.clients.pop(0)
 				player1_ip = player1[1][0]
 				player1_port = player1[1][0]
@@ -88,7 +90,6 @@ class Server():
 				for opponent in self.clients:
 					opponent_ip = opponent[1][0]
 					print("sending opponent " + opponent_ip)
-					########### ERROR WHEN SENDING 
 					conn.send(opponent_ip.encode())
 				d = "done"
 				print(d)

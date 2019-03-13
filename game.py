@@ -8,9 +8,9 @@ pygame.init()
 
 #####################################################################
 ## --- NEXT 4 LINES MUST BE MODIFIED TO MATCH ACTUAL SITUATION --- ##
-MY_SERVER_HOST = '192.168.0.14'
+MY_SERVER_HOST = '169.231.111.165'
 MY_SERVER_PORT = 5000
-MY_IP = '192.168.0.14'
+MY_IP = '169.231.111.165'
 MY_PORT = 0
 OTHER_HOST = ''
 OTHER_PORT = 0
@@ -177,7 +177,7 @@ def look_for_match():
 			continue
 		else: # Data received is an IP address of a potential opponent.
 			response_list = ping(data, size=40, count=5)
-			print(str(index) + ") opponent: " + data + "ping: " + str(response_list.rtt_avg_ms))
+			print(str(index) + ") opponent: " + data + " ping: " + str(response_list.rtt_avg_ms))
 			if (response_list.rtt_avg_ms < min_ping):
 				print("new minimum")
 				min_ping = response_list.rtt_avg_ms
@@ -191,8 +191,9 @@ def look_for_match():
 		#Server.send(str(min_ping_index).rjust(4, '0'), MY_SERVER_HOST, MY_SERVER_PORT)
 		conn.send(str(min_ping_index).rjust(4, '0'))
 
-        # Wait for confirmation of opponent
+	# Wait for confirmation of opponent
 	response = conn.receive()
+	print("RESPONSE FROM SERVER: " + response)
 	return response
 
 #######################################################################
