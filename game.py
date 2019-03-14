@@ -20,8 +20,7 @@ OTHER_PORT = 0
 
 #Ping values
 NUM_PLAYERS = 8
-pings = [10, 50, 100, 200] * NUM_PLAYERS / 4
-
+pings = [10, 50, 100, 200] * (NUM_PLAYERS // 8)
 # Set colors
 RED = (255, 0, 0)
 BLUE = (0, 0, 255)
@@ -184,7 +183,7 @@ def look_for_match():
 		else: # Data received is an IP address of a potential opponent.
 			#response_list = ping(data, size=40, count=5)
 			#ping = response_list.rtt_avg_ms
-			rand = randint(0, len(pings))
+			rand = random.randint(0, len(pings) - 1)
 			ping = pings[rand]
 			pings.remove(ping)
 			print(str(index) + ") opponent: " + data + " ping: " + str(ping))
