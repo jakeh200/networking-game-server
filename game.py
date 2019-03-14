@@ -8,13 +8,17 @@ pygame.init()
 
 #####################################################################
 ## --- NEXT 4 LINES MUST BE MODIFIED TO MATCH ACTUAL SITUATION --- ##
-MY_SERVER_HOST = '169.231.111.165'
+MY_SERVER_HOST = '169.231.118.123'
 MY_SERVER_PORT = 5000
-MY_IP = '169.231.111.165'
+MY_IP = '169.231.118.123'
 MY_PORT = 0
 OTHER_HOST = ''
 OTHER_PORT = 0
 #####################################################################
+
+#Ping values
+NUM_PLAYERS = 8
+pings = [10, 50, 100, 200] * NUM_PLAYERS / 4
 
 # Set colors
 RED = (255, 0, 0)
@@ -176,11 +180,15 @@ def look_for_match():
 		elif (data[0] == 'n'):
 			continue
 		else: # Data received is an IP address of a potential opponent.
-			response_list = ping(data, size=40, count=5)
-			print(str(index) + ") opponent: " + data + " ping: " + str(response_list.rtt_avg_ms))
-			if (response_list.rtt_avg_ms < min_ping):
+			#response_list = ping(data, size=40, count=5)
+			#ping = response_list.rtt_avg_ms
+			rand = randint(0, len(pings))
+			ping = pings[rand]
+			pings.remove(ping)
+			print(str(index) + ") opponent: " + data + " ping: " + str(ping))
+			if (ping < min_ping):
 				print("new minimum")
-				min_ping = response_list.rtt_avg_ms
+				min_ping = ping
 				min_ping_index = index
 				min_ping_opponent = data
 				match_found = True
