@@ -14,15 +14,16 @@ server = None
 def create_match(conn, addr):
 	global server
 	print("Finding match for", addr[0])
-	start = time.time()
 	
 	lock.acquire()
+	start = time.time()
 	match = server.matchmake(addr)
+	end = time.time()
 	lock.release()
 
-	end = time.time()
 	time_to_match = end - start
-
+	print("It took:", time_to_match, "seconds to find a match.")
+	
 	if(match != None):
 		# conn.send("Found a match.\n")
 		player1 = match.get_player1_addr()
@@ -45,7 +46,7 @@ def create_match(conn, addr):
 		server.clear_clients()
 
 	conn.close()
-	print("It took:", time_to_match, "seconds to find a match.")
+	
 	# print(match.get_player1_addr())
 
 def run():

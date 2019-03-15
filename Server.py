@@ -75,7 +75,7 @@ class Server():
 		new_match = None
 
 		#try to match for 60 seconds
-		while(not matched and time.time() - start < 20):
+		while(not matched): #and time.time() - start < 20):
 			print("Time since start", time.time() - start)
 			if(self.client_queue.qsize() >= 2):
 				#take first 2 clients in queue and create a new Match object
