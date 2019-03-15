@@ -79,7 +79,7 @@ class Server():
 		new_match = None
 
 		#try to match for 60 seconds
-		while(not matched and time.time() - start < 20):
+		while(not matched): #and time.time() - start < 20):
 			print("Time since start", time.time() - start)
 			if(len(self.clients) >= 2):
 				# Send the first client the list of the rest of the clients

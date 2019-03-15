@@ -10,9 +10,9 @@ pygame.init()
 ## --- NEXT 4 LINES MUST BE MODIFIED TO MATCH ACTUAL SITUATION --- ##
 host = socket.gethostname() 
 ip = socket.gethostbyname(host)
-MY_SERVER_HOST = ip
+MY_SERVER_HOST = '192.168.0.14'
 MY_SERVER_PORT = 5000
-MY_IP = ip
+MY_IP = '192.168.0.14'
 MY_PORT = 0
 OTHER_HOST = ''
 OTHER_PORT = 0
@@ -172,7 +172,7 @@ def look_for_match():
 	min_ping_index = 0
 	min_ping = 100000
 	min_ping_opponent = ''
-	while(time.time() - start < 60):
+	while(1): #time.time() - start < 60):
 		print("before receiving IP")
 		data = conn.receive()
 		print("after receiving IP, which is " + data)
